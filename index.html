@@ -336,6 +336,7 @@
                     updatePomodoroDisplay();
                 } else {
                     pausePomodoro();
+                                        playAlarmSound();
                     alert('Pomodoro finished!');
                 }
             }, 1000);
@@ -383,6 +384,7 @@
                     updateTimerDisplay();
                 } else {
                     pauseTimer();
+                                        playAlarmSound();
                     alert('Timer finished!');
                 }
             }, 1000);
@@ -405,6 +407,48 @@
         renderTodos();
         updatePomodoroDisplay();
         updateTimerDisplay();
+
+        // Play alarm sound
+        function playAlarmSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Beep sound settings
+            oscillator.frequency.value = 800; // Hz
+            oscillator.type = 'sine';
+            
+            // Volume envelope
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+            
+            // Play 3 beeps
+            setTimeout(() => playBeep(audioContext), 600);
+            setTimeout(() => playBeep(audioContext), 1200);
+        }
+        
+        function playBeep(audioContext) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
 
         // Service Worker Registration
         if ('serviceWorker' in navigator) {
